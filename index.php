@@ -12,22 +12,19 @@
 (function (window) {
 	var Mv = {};
 	
-	Mv.configBase = {
-		domain: 'servicioalcliente.monteverdeltda.com',
-		baseURL: 'https://servicioalcliente.monteverdeltda.com',
-		cookie: {
-			name: 'PHPSESSID'
-			// name: 'X-XSRF-TOKEN'
-		},
-	};
-	
 	Mv._config = {
 		version: null,
 		clientId: null,
+		domain: null,
+		baseURL: null,
+		cookie: {
+			cookieName: null,
+			headerName: null
+		},
 	};
 	
 	Mv._userData = {
-		status: 'not_detect',
+		status: 'disconnect',
 		accessToken: 'none',
 		userID:'0',
 		authResponse: {
@@ -41,7 +38,7 @@
 	
 	Mv.userDataDefault = (() => {
 		return {
-			status: 'not_detect',
+			status: 'disconnect',
 			accessToken: 'none',
 			userID:'0',
 			authResponse: {
@@ -119,7 +116,7 @@
 
 	Mv.api = axios.create({
 		// baseURL:  'https://servicioalcliente.monteverdeltda.com',
-		baseURL: Mv.configBase.baseURL,
+		baseURL: Mv._config.baseURL,
 		withCredentials: true,
 		timeout: 10000,
 		responseType: 'json',
@@ -127,10 +124,8 @@
 	});
 	
 	Mv.api.interceptors.response.use(function(response) {
-		if (response.headers[Mv.configBase.cookie.name]) {
-			document.cookie = Mv.configBase.cookie.name + '=' + response.headers[Mv.configBase.cookie.name] + '; path=/';
-			// console.log('El token si existe, favor validar si existe sesion');
-			Mv.saveToken(response.headers[Mv.configBase.cookie.name]);
+		if (response.headers[Mv._config.cookie.headerName]) {
+			// document.cookie = Mv._config.cookie.cookieName + '=' + Mv.cookie.read(Mv._config.cookie.cookieName) + '; path=/';
 		};
 		return response;
 	});
@@ -138,18 +133,25 @@
 	Mv.getToken = (() => {
 		var tkn = undefined;
 		try{
-			if (Mv.cookie.read(Mv.configBase.cookie.name) != "") {
-				tkn = Mv.cookie.read(Mv.configBase.cookie.name);
-			} else {
-				if(!localStorage._token || localStorage._token == null || localStorage._token == undefined || localStorage._token == ''){
-					tkn = localStorage._token;
-				}
+			console.log('Buscando Cookie: ' + Mv._config.cookie.cookieName);
+			if(Mv.cookie.read(Mv._config.cookie.cookieName) == ''){
+				if(localStorage._token != undefined && localStorage._token != ''){ tkn = localStorage._token; }
+			}else{
+				tkn = Mv.cookie.read(Mv._config.cookie.cookieName);
 			}
+			// Mv.cookie.read(Mv._config.cookie.cookieName)
 		} catch (e) {
 			console.log('SDK - getToken K.O.');
 			console.error(e)
+			tkn = undefined;
 			return false;
 		} finally {
+			if(tkn == undefined){
+				console.log('Token no detectado.');
+			}else{
+				console.log('Token detectado.');
+			}
+			console.log(tkn);
 			return tkn;
 		}
 	});
@@ -372,20 +374,13 @@
 			_tkn = Mv.getToken();
 			_uId = Mv.getUserId();
 		try {
-			if(_tkn != undefined){
-				console.log("Token encontrado.");
-				console.log(_tkn);
-			}else{
-				console.log("Token no ncontrado.");
-			}
+			console.log("checkSession Token.");
+			if (_tkn != undefined){ console.log("encontrado."); } 
+			else { console.log("no ncontrado."); }
 			
-			if(_uId != undefined){
-				console.log("UserId encontrado.");
-				console.log(_uId);
-			}else{
-				console.log("UserId no ncontrado.");
-			}
-			temp.status = 'disconnect';
+			console.log("checkSession userId.");
+			if (_uId != undefined){ console.log("encontrado."); } 
+			else { console.log("no ncontrado."); }
 		} catch (e) {
 			console.log('SDK - checkSession K.O.');
 			console.error(e);
@@ -393,11 +388,19 @@
 			return false;
 		} finally {
 			if(_tkn != undefined && _uId != undefined){
+				temp.status = 'connected';
 				temp.accessToken = _tkn;
 				temp.userID = _uId;
+				localStorage.setItem('_token', _tkn);
+				localStorage.setItem('_userid', _uId);
 			}else{
+				temp.status = 'disconnect';
 				temp = Mv.userDataDefault();
+				Mv.cookie.remove(Mv._config.cookie.cookieName);
+				localStorage.clear();
 			}
+			console.log(localStorage);
+			console.log(temp);
 			Mv._userData = temp;
 			return Mv._userData;
 		}
@@ -414,25 +417,52 @@
 	Mv.init = ((options) => {
 		console.log('SDK - init');
 		try {
+			if (options == null || options == undefined || Mv.typeData(options) != 'object' || options.clientId == undefined || options.version == undefined ){
+				throw new Error('Opciones de init() incorrectas.');
+			};
+			if (Mv.checkVersion(options.version) == false){
+				throw new Error('Version incorrecta en init().');
+			} else {
+				Mv._config.version = Mv.checkVersion(options.version);
+			};
+			if (Mv.clientsAuths(options.clientId) == false){
+				throw new Error('Cliente incorrecto en init().');
+			} else {
+				Mv._config.clientId = Mv.clientsAuths(options.clientId);
+			};
+			if(options.domain == undefined){ 
+				throw new Error('Dominio no definido en init().');
+			} else {
+				Mv._config.domain = options.domain;
+			};
+			if(options.baseURL == undefined){ 
+				throw new Error('baseURL no definido en init().');
+			} else {
+				Mv._config.baseURL = options.baseURL;
+			};
+			
+			if(options.cookie.cookieName == undefined){ 
+				throw new Error('cookieName no definido en init().');
+			} else {
+				Mv._config.cookie.cookieName = options.cookie.cookieName;
+			};
+			if(options.cookie.headerName == undefined){ 
+				throw new Error('headerName no definido en init().');
+			} else {
+				Mv._config.cookie.headerName = options.cookie.headerName;
+			};
+			console.log("Configuracion Init finalizada");
+			console.log(Mv._config);
 		} catch (e) {
-			console.log('SDK - checkSession K.O.');
+			console.log('SDK - init K.O.');
 			console.error(e)
 			return false;
 		}
-		if (options != undefined === null || options == undefined || Mv.typeData(options) != 'object' || options.clientId == undefined || options.version == undefined ){
-			throw new Error('Optiones de init incorrectas.');
-		};
-		if (Mv.checkVersion(options.version) == false){
-			throw new Error('Version incorrecta.');
-		} else {
-			Mv._config.version = Mv.checkVersion(options.version);
-		};
-		if (Mv.clientsAuths(options.clientId) == false){
-			throw new Error('clientId incorrecto.');
-		} else {
-			Mv._config.clientId = Mv.clientsAuths(options.clientId);
-		};
 	});
+	
+	Mv.initConfig = (() => {
+		return Mv._config;
+	})
 	
 	Mv.checkLoginState = (() => {
 		console.log('SDK - checkLoginState');
@@ -699,6 +729,7 @@
 			})
 			.finally(function () {
 				localStorage.clear();
+				Mv.cookie.remove(Mv._config.cookie.cookieName);
 				if(reload != undefined && reload == true){
 					location.reload();
 				}
@@ -707,49 +738,63 @@
 	
 	Mv.login = ((callback) => {
 		console.log("Iniciando login SDK");
-		var code =  new Date().valueOf();
-		var id_form = 'FG-login-modal-form-' + code;
+		Mv.cookie.remove(Mv._config.cookie.cookieName);
 		
-		Mv.callback_active = callback;
-		Mv.Modal.create('FG-login-modal', `<div class="login-form ">
-				<div class="row justify-content-center">
-					<div class="col-md-12">
-						<div class="card" id="FG-login-modal-messages">
-						</div>
-						<div class="card">
-							<div id="` + id_form + `-alert-error" class="" role="alert"></div>
-							<form action="javascript:Mv.postLogIn('` + id_form + `', 'POST', ` + callback + `);" id="` + id_form + `" method="POST">
-								<div class="card-body">
-									<div class="form-group row">
-										<label for="username" class="col-md-4 col-form-label text-md-right">Usuario</label>
-										<div class="col-md-6">
-											<input type="text" class="form-control" name="username" required autofocus>
-										</div>
-									</div>
-
-									<div class="form-group row">
-										<label for="password" class="col-md-4 col-form-label text-md-right">Contraseña</label>
-										<div class="col-md-6">
-											<input type="password" class="form-control" name="password" required />
-										</div>
-									</div>
-
-									<div class="col-md-8 offset-md-2">
-										<button type="submit" class="btn btn-primary">
-											Ingresar
-										</button>
-										<a href="#" class="btn btn-link">
-											¿Olvidaste tu contraseña?
-										</a>
-									</div>
+		Mv.api.post('/logout', {})
+			.then(function (response) {
+				console.log('SDK - Sesion cerrada en el servidor. O.K.');
+			})
+			.catch(function (error) {
+				console.log('SDK - Sesion cerrada en el servidor. K.O.');
+			})
+			.finally(function () {
+				localStorage.clear();
+				
+		
+				var code =  new Date().valueOf();
+				var id_form = 'FG-login-modal-form-' + code;
+				
+				Mv.callback_active = callback;
+				Mv.Modal.create('FG-login-modal', `<div class="login-form ">
+						<div class="row justify-content-center">
+							<div class="col-md-12">
+								<div class="card" id="FG-login-modal-messages">
 								</div>
-							</form>
+								<div class="card">
+									<div id="` + id_form + `-alert-error" class="" role="alert"></div>
+									<form action="javascript:Mv.postLogIn('` + id_form + `', 'POST', ` + callback + `);" id="` + id_form + `" method="POST">
+										<div class="card-body">
+											<div class="form-group row">
+												<label for="username" class="col-md-4 col-form-label text-md-right">Usuario</label>
+												<div class="col-md-6">
+													<input type="text" class="form-control" name="username" required autofocus>
+												</div>
+											</div>
+
+											<div class="form-group row">
+												<label for="password" class="col-md-4 col-form-label text-md-right">Contraseña</label>
+												<div class="col-md-6">
+													<input type="password" class="form-control" name="password" required />
+												</div>
+											</div>
+
+											<div class="col-md-8 offset-md-2">
+												<button type="submit" class="btn btn-primary">
+													Ingresar
+												</button>
+												<a href="#" class="btn btn-link">
+													¿Olvidaste tu contraseña?
+												</a>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
 						</div>
 					</div>
-				</div>
-			</div>
-		`);
-		Mv.Modal.open('FG-login-modal');
+				`);
+				Mv.Modal.open('FG-login-modal');
+			});
 	});
 	
 	Mv.postLogIn = ((id_form, method, callback) => {
@@ -782,10 +827,22 @@
 			Mv.api.post('/login', params)
 			.then(a => {
 				console.log("Respuesta Login. O.K.");
-				if(a.config.headers[Mv.configBase.cookie.name] != undefined){
-					console.log('Token  recibido en headers');
-					localStorage.setItem('_token', a.config.headers[Mv.configBase.cookie.name]);
+				console.log(a);
+				
+				var tkn = undefined;
+				if(a.config.headers[Mv._config.cookie.headerName] != undefined){
+					console.log('Token  recibido en headers => API');
+					console.log(a.config.headers[Mv._config.cookie.headerName]);
+					// localStorage.setItem('_token', a.config.headers[Mv._config.cookie.headerName]);
+					tkn = a.config.headers[Mv._config.cookie.headerName];
+				}else{
+					if(Mv.cookie.read(Mv._config.cookie.cookieName) != ''){
+						tkn = Mv.cookie.read(Mv._config.cookie.cookieName);
+					}
 				}
+				console.log(tkn);
+				console.log(document.cookie);
+				
 				if(a.status == 200 && a.data.id != undefined && a.data.id > 0){
 					localStorage.setItem('_userid', a.data.id);
 					Mv.Modal.eventFire('FG-login-modal-messages', 'click');
@@ -805,6 +862,7 @@
 			})
 			.finally(function () {
 				console.log("Respuesta Login. finally.");
+				document.getElementById('FG-login-modal-messages').innerHTML = 'Procesando datos...';
 				Mv.checkSession();
 				Mv.refreshUser(callback);
 			});
@@ -824,24 +882,23 @@
 				console.log(_tkn);
 				localStorage.setItem('_token', _tkn);
 			}else{
-				throw new Error('SDK - tkn Fail.');
+				// throw new Error('SDK - tkn Fail.');
 			}
+			temp.status = 'disconnect';
 			if(_uId != undefined){
 				console.log("UserId encontrado.");
 				console.log(_uId);
-			}else{
-				throw new Error('SDK - uId Fail.');
-			}
-			temp.status = 'disconnect';
-			
-			Mv.api.get('/records/users/' + _uId, {})
+				
+				Mv.api.get('/records/users/' + _uId, {})
 				.then(a => {
 					console.log("-- Busqueda de usuario. O.K. --");
 					console.log(a.data);
 					if(a.status == 200 && a.data.id != undefined && a.data.id > 0){
 						temp.status = 'connected';
 						localStorage.setItem('_userid', a.data.id);
+						temp.userID = a.data.id;
 						temp.authResponse.userData = a.data;
+						localStorage.setItem('_userid', a.data.id);
 					}else{
 						temp = Mv.userDataDefault();
 					}
@@ -854,6 +911,8 @@
 				})
 				.finally(function () {
 					console.log('refreshUser Finalizado.');
+					console.log(_tkn);
+					console.log(_uId);
 					if(_tkn != undefined && _uId != undefined){
 						temp.accessToken = _tkn;
 						temp.userID = _uId;
@@ -864,6 +923,11 @@
 					console.log(temp)
 					return _callback(Mv._userData);
 				});
+			}else{
+				// Mv.logout(true);
+				//throw new Error('SDK - uId Fail.');
+				_callback(Mv.userDataDefault());
+			}
 		} catch (e) {
 			console.log('SDK - tkn K.O.');
 			console.error(e);
@@ -912,11 +976,12 @@
 		if (!window.MonteverdeAPIInit){
 			throw 'MonteverdeAPIInit no encontrado.';
 		}else{
+			Mv.ready(window.MonteverdeAPIInit);
 			try {
-				// console.log(Mv.checkCookieWritable(Mv.configBase.domain)); // Comprobar cookie de escritura
+				// console.log(Mv.checkCookieWritable(Mv._config.domain)); // Comprobar cookie de escritura
 				// console.log(Mv.testCanLocalStorage()); // Comprobar LocalStorage Writable
 				// console.log(Mv.checkCanSessionStorage()); // Compruebe SessionStorage grabable
-				if(Mv.checkCookieWritable(Mv.configBase.domain) == false){
+				if(Mv.checkCookieWritable(Mv._config.domain) == false){
 					throw new Error('checkCookieWritable Fail.');
 				}
 				if(Mv.testCanLocalStorage() == false){
@@ -932,7 +997,6 @@
 				return false;
 			}
 			finally {
-				Mv.ready(window.MonteverdeAPIInit);
 				Mv.ready(Mv.loadStyles);
 				Mv.ready(Mv.Modal.loadStyle);
 				Mv.ready(Mv.ButtonsLogin);
