@@ -1,4 +1,4 @@
-#Inicio rápido: SDK de Monteverde para JavaScript
+# Inicio rápido: SDK de Monteverde para JavaScript
 
 El SDK de Monteverde para JavaScript proporciona un amplio conjunto de funciones del lado del cliente que:
 
