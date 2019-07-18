@@ -1,13 +1,14 @@
 <?php header('Content-Type: application/javascript'); ?>/* axios v0.19.0 | (c) 2019 by Matt Zabriskie */
 !function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.axios=t():e.axios=t()}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var o=n[r]={exports:{},id:r,loaded:!1};return e[r].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){e.exports=n(1)},function(e,t,n){"use strict";function r(e){var t=new i(e),n=s(i.prototype.request,t);return o.extend(n,i.prototype,t),o.extend(n,t),n}var o=n(2),s=n(3),i=n(5),a=n(22),u=n(11),c=r(u);c.Axios=i,c.create=function(e){return r(a(c.defaults,e))},c.Cancel=n(23),c.CancelToken=n(24),c.isCancel=n(10),c.all=function(e){return Promise.all(e)},c.spread=n(25),e.exports=c,e.exports.default=c},function(e,t,n){"use strict";function r(e){return"[object Array]"===j.call(e)}function o(e){return"[object ArrayBuffer]"===j.call(e)}function s(e){return"undefined"!=typeof FormData&&e instanceof FormData}function i(e){var t;return t="undefined"!=typeof ArrayBuffer&&ArrayBuffer.isView?ArrayBuffer.isView(e):e&&e.buffer&&e.buffer instanceof ArrayBuffer}function a(e){return"string"==typeof e}function u(e){return"number"==typeof e}function c(e){return"undefined"==typeof e}function f(e){return null!==e&&"object"==typeof e}function p(e){return"[object Date]"===j.call(e)}function d(e){return"[object File]"===j.call(e)}function l(e){return"[object Blob]"===j.call(e)}function h(e){return"[object Function]"===j.call(e)}function m(e){return f(e)&&h(e.pipe)}function y(e){return"undefined"!=typeof URLSearchParams&&e instanceof URLSearchParams}function g(e){return e.replace(/^\s*/,"").replace(/\s*$/,"")}function x(){return("undefined"==typeof navigator||"ReactNative"!==navigator.product&&"NativeScript"!==navigator.product&&"NS"!==navigator.product)&&("undefined"!=typeof window&&"undefined"!=typeof document)}function v(e,t){if(null!==e&&"undefined"!=typeof e)if("object"!=typeof e&&(e=[e]),r(e))for(var n=0,o=e.length;n<o;n++)t.call(null,e[n],n,e);else for(var s in e)Object.prototype.hasOwnProperty.call(e,s)&&t.call(null,e[s],s,e)}function w(){function e(e,n){"object"==typeof t[n]&&"object"==typeof e?t[n]=w(t[n],e):t[n]=e}for(var t={},n=0,r=arguments.length;n<r;n++)v(arguments[n],e);return t}function b(){function e(e,n){"object"==typeof t[n]&&"object"==typeof e?t[n]=b(t[n],e):"object"==typeof e?t[n]=b({},e):t[n]=e}for(var t={},n=0,r=arguments.length;n<r;n++)v(arguments[n],e);return t}function E(e,t,n){return v(t,function(t,r){n&&"function"==typeof t?e[r]=S(t,n):e[r]=t}),e}var S=n(3),R=n(4),j=Object.prototype.toString;e.exports={isArray:r,isArrayBuffer:o,isBuffer:R,isFormData:s,isArrayBufferView:i,isString:a,isNumber:u,isObject:f,isUndefined:c,isDate:p,isFile:d,isBlob:l,isFunction:h,isStream:m,isURLSearchParams:y,isStandardBrowserEnv:x,forEach:v,merge:w,deepMerge:b,extend:E,trim:g}},function(e,t){"use strict";e.exports=function(e,t){return function(){for(var n=new Array(arguments.length),r=0;r<n.length;r++)n[r]=arguments[r];return e.apply(t,n)}}},function(e,t){e.exports=function(e){return null!=e&&null!=e.constructor&&"function"==typeof e.constructor.isBuffer&&e.constructor.isBuffer(e)}},function(e,t,n){"use strict";function r(e){this.defaults=e,this.interceptors={request:new i,response:new i}}var o=n(2),s=n(6),i=n(7),a=n(8),u=n(22);r.prototype.request=function(e){"string"==typeof e?(e=arguments[1]||{},e.url=arguments[0]):e=e||{},e=u(this.defaults,e),e.method=e.method?e.method.toLowerCase():"get";var t=[a,void 0],n=Promise.resolve(e);for(this.interceptors.request.forEach(function(e){t.unshift(e.fulfilled,e.rejected)}),this.interceptors.response.forEach(function(e){t.push(e.fulfilled,e.rejected)});t.length;)n=n.then(t.shift(),t.shift());return n},r.prototype.getUri=function(e){return e=u(this.defaults,e),s(e.url,e.params,e.paramsSerializer).replace(/^\?/,"")},o.forEach(["delete","get","head","options"],function(e){r.prototype[e]=function(t,n){return this.request(o.merge(n||{},{method:e,url:t}))}}),o.forEach(["post","put","patch"],function(e){r.prototype[e]=function(t,n,r){return this.request(o.merge(r||{},{method:e,url:t,data:n}))}}),e.exports=r},function(e,t,n){"use strict";function r(e){return encodeURIComponent(e).replace(/%40/gi,"@").replace(/%3A/gi,":").replace(/%24/g,"$").replace(/%2C/gi,",").replace(/%20/g,"+").replace(/%5B/gi,"[").replace(/%5D/gi,"]")}var o=n(2);e.exports=function(e,t,n){if(!t)return e;var s;if(n)s=n(t);else if(o.isURLSearchParams(t))s=t.toString();else{var i=[];o.forEach(t,function(e,t){null!==e&&"undefined"!=typeof e&&(o.isArray(e)?t+="[]":e=[e],o.forEach(e,function(e){o.isDate(e)?e=e.toISOString():o.isObject(e)&&(e=JSON.stringify(e)),i.push(r(t)+"="+r(e))}))}),s=i.join("&")}if(s){var a=e.indexOf("#");a!==-1&&(e=e.slice(0,a)),e+=(e.indexOf("?")===-1?"?":"&")+s}return e}},function(e,t,n){"use strict";function r(){this.handlers=[]}var o=n(2);r.prototype.use=function(e,t){return this.handlers.push({fulfilled:e,rejected:t}),this.handlers.length-1},r.prototype.eject=function(e){this.handlers[e]&&(this.handlers[e]=null)},r.prototype.forEach=function(e){o.forEach(this.handlers,function(t){null!==t&&e(t)})},e.exports=r},function(e,t,n){"use strict";function r(e){e.cancelToken&&e.cancelToken.throwIfRequested()}var o=n(2),s=n(9),i=n(10),a=n(11),u=n(20),c=n(21);e.exports=function(e){r(e),e.baseURL&&!u(e.url)&&(e.url=c(e.baseURL,e.url)),e.headers=e.headers||{},e.data=s(e.data,e.headers,e.transformRequest),e.headers=o.merge(e.headers.common||{},e.headers[e.method]||{},e.headers||{}),o.forEach(["delete","get","head","post","put","patch","common"],function(t){delete e.headers[t]});var t=e.adapter||a.adapter;return t(e).then(function(t){return r(e),t.data=s(t.data,t.headers,e.transformResponse),t},function(t){return i(t)||(r(e),t&&t.response&&(t.response.data=s(t.response.data,t.response.headers,e.transformResponse))),Promise.reject(t)})}},function(e,t,n){"use strict";var r=n(2);e.exports=function(e,t,n){return r.forEach(n,function(n){e=n(e,t)}),e}},function(e,t){"use strict";e.exports=function(e){return!(!e||!e.__CANCEL__)}},function(e,t,n){"use strict";function r(e,t){!s.isUndefined(e)&&s.isUndefined(e["Content-Type"])&&(e["Content-Type"]=t)}function o(){var e;return"undefined"!=typeof process&&"[object process]"===Object.prototype.toString.call(process)?e=n(13):"undefined"!=typeof XMLHttpRequest&&(e=n(13)),e}var s=n(2),i=n(12),a={"Content-Type":"application/x-www-form-urlencoded"},u={adapter:o(),transformRequest:[function(e,t){return i(t,"Accept"),i(t,"Content-Type"),s.isFormData(e)||s.isArrayBuffer(e)||s.isBuffer(e)||s.isStream(e)||s.isFile(e)||s.isBlob(e)?e:s.isArrayBufferView(e)?e.buffer:s.isURLSearchParams(e)?(r(t,"application/x-www-form-urlencoded;charset=utf-8"),e.toString()):s.isObject(e)?(r(t,"application/json;charset=utf-8"),JSON.stringify(e)):e}],transformResponse:[function(e){if("string"==typeof e)try{e=JSON.parse(e)}catch(e){}return e}],timeout:0,xsrfCookieName:"XSRF-TOKEN",xsrfHeaderName:"X-XSRF-TOKEN",maxContentLength:-1,validateStatus:function(e){return e>=200&&e<300}};u.headers={common:{Accept:"application/json, text/plain, */*"}},s.forEach(["delete","get","head"],function(e){u.headers[e]={}}),s.forEach(["post","put","patch"],function(e){u.headers[e]=s.merge(a)}),e.exports=u},function(e,t,n){"use strict";var r=n(2);e.exports=function(e,t){r.forEach(e,function(n,r){r!==t&&r.toUpperCase()===t.toUpperCase()&&(e[t]=n,delete e[r])})}},function(e,t,n){"use strict";var r=n(2),o=n(14),s=n(6),i=n(17),a=n(18),u=n(15);e.exports=function(e){return new Promise(function(t,c){var f=e.data,p=e.headers;r.isFormData(f)&&delete p["Content-Type"];var d=new XMLHttpRequest;if(e.auth){var l=e.auth.username||"",h=e.auth.password||"";p.Authorization="Basic "+btoa(l+":"+h)}if(d.open(e.method.toUpperCase(),s(e.url,e.params,e.paramsSerializer),!0),d.timeout=e.timeout,d.onreadystatechange=function(){if(d&&4===d.readyState&&(0!==d.status||d.responseURL&&0===d.responseURL.indexOf("file:"))){var n="getAllResponseHeaders"in d?i(d.getAllResponseHeaders()):null,r=e.responseType&&"text"!==e.responseType?d.response:d.responseText,s={data:r,status:d.status,statusText:d.statusText,headers:n,config:e,request:d};o(t,c,s),d=null}},d.onabort=function(){d&&(c(u("Request aborted",e,"ECONNABORTED",d)),d=null)},d.onerror=function(){c(u("Network Error",e,null,d)),d=null},d.ontimeout=function(){c(u("timeout of "+e.timeout+"ms exceeded",e,"ECONNABORTED",d)),d=null},r.isStandardBrowserEnv()){var m=n(19),y=(e.withCredentials||a(e.url))&&e.xsrfCookieName?m.read(e.xsrfCookieName):void 0;y&&(p[e.xsrfHeaderName]=y)}if("setRequestHeader"in d&&r.forEach(p,function(e,t){"undefined"==typeof f&&"content-type"===t.toLowerCase()?delete p[t]:d.setRequestHeader(t,e)}),e.withCredentials&&(d.withCredentials=!0),e.responseType)try{d.responseType=e.responseType}catch(t){if("json"!==e.responseType)throw t}"function"==typeof e.onDownloadProgress&&d.addEventListener("progress",e.onDownloadProgress),"function"==typeof e.onUploadProgress&&d.upload&&d.upload.addEventListener("progress",e.onUploadProgress),e.cancelToken&&e.cancelToken.promise.then(function(e){d&&(d.abort(),c(e),d=null)}),void 0===f&&(f=null),d.send(f)})}},function(e,t,n){"use strict";var r=n(15);e.exports=function(e,t,n){var o=n.config.validateStatus;!o||o(n.status)?e(n):t(r("Request failed with status code "+n.status,n.config,null,n.request,n))}},function(e,t,n){"use strict";var r=n(16);e.exports=function(e,t,n,o,s){var i=new Error(e);return r(i,t,n,o,s)}},function(e,t){"use strict";e.exports=function(e,t,n,r,o){return e.config=t,n&&(e.code=n),e.request=r,e.response=o,e.isAxiosError=!0,e.toJSON=function(){return{message:this.message,name:this.name,description:this.description,number:this.number,fileName:this.fileName,lineNumber:this.lineNumber,columnNumber:this.columnNumber,stack:this.stack,config:this.config,code:this.code}},e}},function(e,t,n){"use strict";var r=n(2),o=["age","authorization","content-length","content-type","etag","expires","from","host","if-modified-since","if-unmodified-since","last-modified","location","max-forwards","proxy-authorization","referer","retry-after","user-agent"];e.exports=function(e){var t,n,s,i={};return e?(r.forEach(e.split("\n"),function(e){if(s=e.indexOf(":"),t=r.trim(e.substr(0,s)).toLowerCase(),n=r.trim(e.substr(s+1)),t){if(i[t]&&o.indexOf(t)>=0)return;"set-cookie"===t?i[t]=(i[t]?i[t]:[]).concat([n]):i[t]=i[t]?i[t]+", "+n:n}}),i):i}},function(e,t,n){"use strict";var r=n(2);e.exports=r.isStandardBrowserEnv()?function(){function e(e){var t=e;return n&&(o.setAttribute("href",t),t=o.href),o.setAttribute("href",t),{href:o.href,protocol:o.protocol?o.protocol.replace(/:$/,""):"",host:o.host,search:o.search?o.search.replace(/^\?/,""):"",hash:o.hash?o.hash.replace(/^#/,""):"",hostname:o.hostname,port:o.port,pathname:"/"===o.pathname.charAt(0)?o.pathname:"/"+o.pathname}}var t,n=/(msie|trident)/i.test(navigator.userAgent),o=document.createElement("a");return t=e(window.location.href),function(n){var o=r.isString(n)?e(n):n;return o.protocol===t.protocol&&o.host===t.host}}():function(){return function(){return!0}}()},function(e,t,n){"use strict";var r=n(2);e.exports=r.isStandardBrowserEnv()?function(){return{write:function(e,t,n,o,s,i){var a=[];a.push(e+"="+encodeURIComponent(t)),r.isNumber(n)&&a.push("expires="+new Date(n).toGMTString()),r.isString(o)&&a.push("path="+o),r.isString(s)&&a.push("domain="+s),i===!0&&a.push("secure"),document.cookie=a.join("; ")},read:function(e){var t=document.cookie.match(new RegExp("(^|;\\s*)("+e+")=([^;]*)"));return t?decodeURIComponent(t[3]):null},remove:function(e){this.write(e,"",Date.now()-864e5)}}}():function(){return{write:function(){},read:function(){return null},remove:function(){}}}()},function(e,t){"use strict";e.exports=function(e){return/^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(e)}},function(e,t){"use strict";e.exports=function(e,t){return t?e.replace(/\/+$/,"")+"/"+t.replace(/^\/+/,""):e}},function(e,t,n){"use strict";var r=n(2);e.exports=function(e,t){t=t||{};var n={};return r.forEach(["url","method","params","data"],function(e){"undefined"!=typeof t[e]&&(n[e]=t[e])}),r.forEach(["headers","auth","proxy"],function(o){r.isObject(t[o])?n[o]=r.deepMerge(e[o],t[o]):"undefined"!=typeof t[o]?n[o]=t[o]:r.isObject(e[o])?n[o]=r.deepMerge(e[o]):"undefined"!=typeof e[o]&&(n[o]=e[o])}),r.forEach(["baseURL","transformRequest","transformResponse","paramsSerializer","timeout","withCredentials","adapter","responseType","xsrfCookieName","xsrfHeaderName","onUploadProgress","onDownloadProgress","maxContentLength","validateStatus","maxRedirects","httpAgent","httpsAgent","cancelToken","socketPath"],function(r){"undefined"!=typeof t[r]?n[r]=t[r]:"undefined"!=typeof e[r]&&(n[r]=e[r])}),n}},function(e,t){"use strict";function n(e){this.message=e}n.prototype.toString=function(){return"Cancel"+(this.message?": "+this.message:"")},n.prototype.__CANCEL__=!0,e.exports=n},function(e,t,n){"use strict";function r(e){if("function"!=typeof e)throw new TypeError("executor must be a function.");var t;this.promise=new Promise(function(e){t=e});var n=this;e(function(e){n.reason||(n.reason=new o(e),t(n.reason))})}var o=n(23);r.prototype.throwIfRequested=function(){if(this.reason)throw this.reason},r.source=function(){var e,t=new r(function(t){e=t});return{token:t,cancel:e}},e.exports=r},function(e,t){"use strict";e.exports=function(e){return function(t){return e.apply(null,t)}}}])});/*
- * This is the sdk template introduced in javascript-sdk-design
- *
- * Template Init
  * ==============
- * This is a template that offer oop Object
- *
+ * SDK JavaScript - API REST - Monteverde LTDA - Servicios ambientales y forestales.
+ * ==============
+ * Git: https://github.com/MonteverdeLtda/sdk-javascript-api
+ * 
+ * 
+ * 
  * To find out more sdk template, please visit javascript-sdk-design homepage
- * https://github.com/huei90/javascript-sdk-design
+ * Example from: https://github.com/huei90/javascript-sdk-design
  */
 (function (window) {
 	var Mv = {};
@@ -133,7 +134,7 @@
 	Mv.getToken = (() => {
 		var tkn = undefined;
 		try{
-			console.log('Buscando Cookie: ' + Mv._config.cookie.cookieName);
+			// console.log('Buscando Cookie: ' + Mv._config.cookie.cookieName);
 			if(Mv.cookie.read(Mv._config.cookie.cookieName) == ''){
 				if(localStorage._token != undefined && localStorage._token != ''){ tkn = localStorage._token; }
 			}else{
@@ -147,18 +148,18 @@
 			return false;
 		} finally {
 			if(tkn == undefined){
-				console.log('Token no detectado.');
+				// console.log('Token no detectado.');
 			}else{
-				console.log('Token detectado.');
+				// console.log('Token detectado.');
 			}
-			console.log(tkn);
+			// console.log(tkn);
 			return tkn;
 		}
 	});
 	
 	Mv.getUserId = (() => {
 		var uId = undefined;
-		console.log(localStorage);
+		// console.log(localStorage);
 		try{
 			if(!localStorage._userid || localStorage._userid == null || localStorage._userid == undefined || localStorage._userid <= 0){
 				
@@ -327,7 +328,7 @@
 			// console.log('SDK - type: ' + type);
 			return type;
 		} else {
-			console.log('type: undefined');
+			// console.log('type: undefined');
 			return 'undefined';
 		}
 	});
@@ -369,18 +370,26 @@
 	});
 		
 	Mv.checkSession = (() => {
-		console.log('SDK - checkSession');
+		// console.log('SDK - checkSession');
 		var temp = Mv.userDataDefault();
 			_tkn = Mv.getToken();
 			_uId = Mv.getUserId();
 		try {
-			console.log("checkSession Token.");
-			if (_tkn != undefined){ console.log("encontrado."); } 
-			else { console.log("no ncontrado."); }
+			// console.log("checkSession Token.");
+			if (_tkn != undefined){
+				// console.log("encontrado.");
+			} 
+			else {
+				// console.log("no ncontrado.");
+			}
 			
-			console.log("checkSession userId.");
-			if (_uId != undefined){ console.log("encontrado."); } 
-			else { console.log("no ncontrado."); }
+			// console.log("checkSession userId.");
+			if (_uId != undefined){
+				// console.log("encontrado.");
+			} 
+			else {
+				// console.log("no ncontrado.");
+			}
 		} catch (e) {
 			console.log('SDK - checkSession K.O.');
 			console.error(e);
@@ -399,8 +408,8 @@
 				Mv.cookie.remove(Mv._config.cookie.cookieName);
 				localStorage.clear();
 			}
-			console.log(localStorage);
-			console.log(temp);
+			// console.log(localStorage);
+			// console.log(temp);
 			Mv._userData = temp;
 			return Mv._userData;
 		}
@@ -415,7 +424,7 @@
 	});
 
 	Mv.init = ((options) => {
-		console.log('SDK - init');
+		// console.log('SDK - init');
 		try {
 			if (options == null || options == undefined || Mv.typeData(options) != 'object' || options.clientId == undefined || options.version == undefined ){
 				throw new Error('Opciones de init() incorrectas.');
@@ -451,8 +460,8 @@
 			} else {
 				Mv._config.cookie.headerName = options.cookie.headerName;
 			};
-			console.log("Configuracion Init finalizada");
-			console.log(Mv._config);
+			// console.log("Configuracion Init finalizada");
+			// console.log(Mv._config);
 		} catch (e) {
 			console.log('SDK - init K.O.');
 			console.error(e)
@@ -722,10 +731,10 @@
 		
 		Mv.api.post('/logout', {})
 			.then(function (response) {
-				console.log('SDK - Sesion cerrada en el servidor. O.K.');
+				// console.log('SDK - Sesion cerrada en el servidor. O.K.');
 			})
 			.catch(function (error) {
-				console.log('SDK - Sesion cerrada en el servidor. K.O.');
+				// console.log('SDK - Sesion cerrada en el servidor. K.O.');
 			})
 			.finally(function () {
 				localStorage.clear();
@@ -737,15 +746,15 @@
 	});
 	
 	Mv.login = ((callback) => {
-		console.log("Iniciando login SDK");
+		// console.log("Iniciando login SDK");
 		Mv.cookie.remove(Mv._config.cookie.cookieName);
 		
 		Mv.api.post('/logout', {})
 			.then(function (response) {
-				console.log('SDK - Sesion cerrada en el servidor. O.K.');
+				// console.log('SDK - Sesion cerrada en el servidor. O.K.');
 			})
 			.catch(function (error) {
-				console.log('SDK - Sesion cerrada en el servidor. K.O.');
+				// console.log('SDK - Sesion cerrada en el servidor. K.O.');
 			})
 			.finally(function () {
 				localStorage.clear();
@@ -798,7 +807,7 @@
 	});
 	
 	Mv.postLogIn = ((id_form, method, callback) => {
-		console.log("SDK - Iniciando postLogIn");
+		// console.log("SDK - Iniciando postLogIn");
 		try {
 			if(!document.getElementById('FG-login-modal-messages')){
 				throw new Error('Optiones de init incorrectas.');
@@ -810,8 +819,8 @@
 			var params = Mv.input_to_code(oForm.elements);
 			_callback = callback || callback_active;
 		} catch (e) {
-			console.log('SDK - postLogIn K.O.');
-			console.error(e);
+			// console.log('SDK - postLogIn K.O.');
+			// console.error(e);
 			
 			document.getElementById('FG-login-modal-messages').innerHTML = 'Error de ingreso.';			
 			if(e.response.data.code != undefined && e.response.data.code == 1012){
@@ -821,18 +830,18 @@
 			return false;
 		} finally {
 			document.getElementById('FG-login-modal-messages').innerHTML = 'Por favor espere...';
-			console.log('Enviando parametros de LogIn.');
-			console.log(params);
+			// console.log('Enviando parametros de LogIn.');
+			// console.log(params);
 			
 			Mv.api.post('/login', params)
 			.then(a => {
-				console.log("Respuesta Login. O.K.");
-				console.log(a);
+				// console.log("Respuesta Login. O.K.");
+				// console.log(a);
 				
 				var tkn = undefined;
 				if(a.config.headers[Mv._config.cookie.headerName] != undefined){
-					console.log('Token  recibido en headers => API');
-					console.log(a.config.headers[Mv._config.cookie.headerName]);
+					// console.log('Token  recibido en headers => API');
+					// console.log(a.config.headers[Mv._config.cookie.headerName]);
 					// localStorage.setItem('_token', a.config.headers[Mv._config.cookie.headerName]);
 					tkn = a.config.headers[Mv._config.cookie.headerName];
 				}else{
@@ -840,8 +849,8 @@
 						tkn = Mv.cookie.read(Mv._config.cookie.cookieName);
 					}
 				}
-				console.log(tkn);
-				console.log(document.cookie);
+				// console.log(tkn);
+				// console.log(document.cookie);
 				
 				if(a.status == 200 && a.data.id != undefined && a.data.id > 0){
 					localStorage.setItem('_userid', a.data.id);
@@ -852,7 +861,7 @@
 				}
 			})
 			.catch(function (e) {
-				console.log("Respuesta Login. K.O.");
+				// console.log("Respuesta Login. K.O.");
 				if(e.response.data != undefined && e.response.data.code != undefined && e.response.data.code == 1012){
 					document.getElementById('FG-login-modal-messages').innerHTML = 'Datos Invalidos.';
 				}else{
@@ -861,7 +870,7 @@
 				return false;
 			})
 			.finally(function () {
-				console.log("Respuesta Login. finally.");
+				// console.log("Respuesta Login. finally.");
 				document.getElementById('FG-login-modal-messages').innerHTML = 'Procesando datos...';
 				Mv.checkSession();
 				Mv.refreshUser(callback);
@@ -870,7 +879,7 @@
 	});
 	
 	Mv.refreshUser = ((call) => {
-		console.log("SDK - refreshUser");
+		// console.log("SDK - refreshUser");
 		var _callback = call || Mv.callback_active;
 		var temp = Mv.userDataDefault();
 			_uId = Mv.getUserId();
@@ -878,21 +887,21 @@
 			
 		try {
 			if(_tkn != undefined){
-				console.log("Token encontrado.");
-				console.log(_tkn);
+				// console.log("Token encontrado.");
+				// console.log(_tkn);
 				localStorage.setItem('_token', _tkn);
 			}else{
 				// throw new Error('SDK - tkn Fail.');
 			}
 			temp.status = 'disconnect';
 			if(_uId != undefined){
-				console.log("UserId encontrado.");
-				console.log(_uId);
+				// console.log("UserId encontrado.");
+				// console.log(_uId);
 				
 				Mv.api.get('/records/users/' + _uId, {})
 				.then(a => {
-					console.log("-- Busqueda de usuario. O.K. --");
-					console.log(a.data);
+					// console.log("-- Busqueda de usuario. O.K. --");
+					// console.log(a.data);
 					if(a.status == 200 && a.data.id != undefined && a.data.id > 0){
 						temp.status = 'connected';
 						localStorage.setItem('_userid', a.data.id);
@@ -904,15 +913,15 @@
 					}
 				})
 				.catch(function (e) {
-					console.log("Busqueda de usuario. K.O.");
+					// console.log("Busqueda de usuario. K.O.");
 					temp = Mv.userDataDefault();
-					console.log(e.response);
+					// console.log(e.response);
 					return false;
 				})
 				.finally(function () {
-					console.log('refreshUser Finalizado.');
-					console.log(_tkn);
-					console.log(_uId);
+					// console.log('refreshUser Finalizado.');
+					// console.log(_tkn);
+					// console.log(_uId);
 					if(_tkn != undefined && _uId != undefined){
 						temp.accessToken = _tkn;
 						temp.userID = _uId;
@@ -920,12 +929,10 @@
 						temp = Mv.userDataDefault();
 					}
 					Mv._userData = temp;
-					console.log(temp)
+					// console.log(temp)
 					return _callback(Mv._userData);
 				});
 			}else{
-				// Mv.logout(true);
-				//throw new Error('SDK - uId Fail.');
 				_callback(Mv.userDataDefault());
 			}
 		} catch (e) {
@@ -952,12 +959,14 @@
 						});
 					}
 				}else{
+					console.log('SDK - El paramentro en SDK.ready debe ser una function.');
 					console.log(fn);
 					throw new Error('El paramentro en SDK.ready debe ser una function.');
 				}
 			};
 		}
 		catch (ex) {
+			console.log('SDK - Error en ready');
 			console.error('inner', ex.message);
 			throw ex;
 		}
